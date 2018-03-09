@@ -5,6 +5,9 @@
 #include <QByteArray>
 #include <QList>
 #include <QImage>
+#include <QLineEdit>
+#include <QPrinter>
+#include <QString>
 
 namespace Ui {
 class SkanToPdfDlg;
@@ -47,8 +50,10 @@ private slots:
      */
     void onImageReady(QByteArray &data, int width, int height, int bytes_per_line, int format);
     void on_folderFindBtn_clicked();
-
     void on_saveBtn_clicked();
+    void on_btnPreview_clicked();
+
+    void on_sendMailBtn_clicked();
 
 private:
     Ui::SkanToPdfDlg *ui; /// the ui pointer
@@ -60,6 +65,13 @@ private:
      */
     void initialize();
     void initDevice(QMap<QString,QString> options, QString selectedDevice);
+
+    QString retrieveText(const QLineEdit * const lineEdit);
+    QString createFileUrl(const QString &file, const QString &folder);
+    void setupPrinter(QPrinter &printer, const QString &pathToPdfFile);
+    void printPages(QPrinter &printer, const QString &file, const QString &folder);
+    QString _attachement = "";
+    QString _pdfFile = "";
 };
 
 #endif // SKANTOPDFDLG_H

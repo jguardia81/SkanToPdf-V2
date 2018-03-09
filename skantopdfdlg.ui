@@ -139,9 +139,9 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="Btn">
+                 <widget class="QPushButton" name="btnPreview">
                   <property name="text">
-                   <string>Pdf Preview</string>
+                   <string>Preview</string>
                   </property>
                  </widget>
                 </item>
