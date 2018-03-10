@@ -25,10 +25,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        skantopdfdlg.cpp
+        skantopdfdlg.cpp \
+    automaticfilenamefeeder.cpp \
+    appcontext.cpp
 
 HEADERS += \
-        skantopdfdlg.h
+        skantopdfdlg.h \
+    automaticfilenamefeeder.h \
+    appcontext.h
 
 FORMS += \
         skantopdfdlg.ui

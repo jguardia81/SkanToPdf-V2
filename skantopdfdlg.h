@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QPrinter>
 #include <QString>
+#include <QSettings>
 
 namespace Ui {
 class SkanToPdfDlg;
@@ -72,6 +73,7 @@ private:
     void printPages(QPrinter &printer, const QString &file, const QString &folder);
     QString _attachement = "";
     QString _pdfFile = "";
+    QSettings* _appSettings = nullptr;
 };
 
 #endif // SKANTOPDFDLG_H

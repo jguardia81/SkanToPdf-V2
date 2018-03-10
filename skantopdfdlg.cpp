@@ -8,6 +8,9 @@
 #include <QUrl>
 #include <QDesktopServices>
 #include <QDebug>
+
+
+
 /**
  * @brief SkanToPdfDlg::SkanToPdfDlg
  * @param parent: given parent widget
@@ -86,7 +89,7 @@ void SkanToPdfDlg::initDevice(QMap<QString,QString> options, QString selectedDev
 void SkanToPdfDlg::initialize() {
     QString selectedDevice = "";
     QMap<QString,QString> options;
-    ui->tabWidget->setCurrentIndex(0);
+
     bool getOut = false;
     bool deviceInitialized = false;
     while (!getOut) {
@@ -113,6 +116,7 @@ void SkanToPdfDlg::initialize() {
         this->close();
         QApplication::exit(-1);
     }
+
 }
 
 /**
@@ -135,7 +139,7 @@ void SkanToPdfDlg::on_folderFindBtn_clicked()
  * @brief SkanToPdfDlg::retrieveText Retrieve trimmed
  * teext from line edit box
  * @param lineEdit the given line edit
- * @return the trimmed text of the lienedit
+ * @return the trimmed text of the linedit
  */
 QString SkanToPdfDlg::retrieveText(const QLineEdit* const lineEdit) {
     QString retrievedText = "";
@@ -215,7 +219,10 @@ QString SkanToPdfDlg::createFileUrl(const QString& file,  const QString& folder)
     return pathToPdfFile;
 }
 
-
+/**
+ * @brief SkanToPdfDlg::on_btnPreview_clicked
+ * TODO:
+ */
 void SkanToPdfDlg::on_btnPreview_clicked()
 {
 
@@ -269,6 +276,10 @@ void SkanToPdfDlg::printPages(QPrinter& printer, const QString &file, const QStr
     _dirty = false;
 }
 
+/**
+ * @brief SkanToPdfDlg::on_sendMailBtn_clicked
+ * Send by mail slot
+ */
 void SkanToPdfDlg::on_sendMailBtn_clicked()
 {
     QString filename = _attachement;
@@ -285,6 +296,6 @@ void SkanToPdfDlg::on_sendMailBtn_clicked()
 
     QString subject = tr("Sending %1").arg(_pdfFile);
     QString urlToOpen = QString("mailto:?subject=%1&attach=%2").arg(subject).arg(filename);
-    qDebug() << urlToOpen;
+
     QDesktopServices::openUrl(QUrl(urlToOpen));
 }
