@@ -10,7 +10,6 @@
 #include <QDebug>
 
 
-
 /**
  * @brief SkanToPdfDlg::SkanToPdfDlg
  * @param parent: given parent widget
@@ -21,6 +20,7 @@ SkanToPdfDlg::SkanToPdfDlg(QWidget *parent) :
 {
     ui->setupUi(this);
     initialize();
+
 }
 /**
  * @brief SkanToPdfDlg::~SkanToPdfDlg
@@ -180,10 +180,10 @@ void SkanToPdfDlg::on_saveBtn_clicked()
     // Check generated file nalme existence
     if (QFile::exists(pathToPdfFile)) {
         int result = QMessageBox::warning(this,tr("File exists"),
-                                          QString(tr("Warning %1 already exists inf folder %2. Overwrite it ?"))
+                                          QString(tr("Warning %1 already exists in folder %2. Overwrite it ?"))
                                           .arg(pdfName).arg(folderName),QMessageBox::Yes, QMessageBox::No);
         if (result == QMessageBox::No) {
-            QMessageBox::warning(this,"Warning", tr("Change file name or folder."));
+            QMessageBox::warning(this,tr("Warning"), tr("Change file name or folder."));
             ui->pdfNameLineEdit->setFocus();
             return;
         }
@@ -272,7 +272,7 @@ void SkanToPdfDlg::printPages(QPrinter& printer, const QString &file, const QStr
         painter.drawImage(printer.pageRect(),_images.at(index));
     }
     painter.end();
-    QMessageBox::information(this,QString(tr("Saving file")),QString("File %1 has been saved in folder %2").arg(file).arg(folder));
+    QMessageBox::information(this,QString(tr("Saving file")),QString("File %1 has been saved in folder %2.").arg(file).arg(folder));
     _dirty = false;
 }
 
