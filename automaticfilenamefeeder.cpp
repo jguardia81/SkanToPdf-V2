@@ -1,16 +1,18 @@
 #include "automaticfilenamefeeder.h"
+#include <QDebug>
 #include <QDir>
-#include <QStringList>
+#include <QFileInfoList>
+
 AutomaticFileNameFeeder::AutomaticFileNameFeeder()
 {
-
 }
 
-QString AutomaticFileNameFeeder::getFileName(const QString &path)
+QString AutomaticFileNameFeeder::getFileName(const QString& path)
 {
-   /* QDir exploredDir(path,FILENAME_TEMPLATE,QDir::Files);
+    QDir exploredDir(path, FILENAME_TEMPLATE, QDir::Name | QDir::IgnoreCase, QDir::Files);
 
-    QStringList fileList = exploredDir.entryInfoList(new QStringList(FILENAME_TEMPLATE),QDir::Files);
-    qDebug()  << fileList;*/
+    QFileInfoList fileList = exploredDir.entryInfoList(QStringList(FILENAME_TEMPLATE), QDir::Files);
+    qDebug() << fileList;
 
+    return QString();
 }

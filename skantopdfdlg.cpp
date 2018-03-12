@@ -1,26 +1,27 @@
 #include "skantopdfdlg.h"
+#include "appcontext.h"
+#include "automaticfilenamefeeder.h"
 #include "ui_skantopdfdlg.h"
-#include <QString>
+#include <QDebug>
+#include <QDesktopServices>
+#include <QFileDialog>
 #include <QMap>
 #include <QMessageBox>
-#include <QFileDialog>
 #include <QPainter>
+#include <QString>
 #include <QUrl>
-#include <QDesktopServices>
-#include <QDebug>
-
 
 /**
  * @brief SkanToPdfDlg::SkanToPdfDlg
  * @param parent: given parent widget
  */
-SkanToPdfDlg::SkanToPdfDlg(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::SkanToPdfDlg)
+SkanToPdfDlg::SkanToPdfDlg(QWidget* parent)
+    : QDialog(parent)
+    , ui(new Ui::SkanToPdfDlg)
 {
     ui->setupUi(this);
     initialize();
-
+    AppContext::getInstance()->getCurrentFolder();
 }
 /**
  * @brief SkanToPdfDlg::~SkanToPdfDlg
@@ -37,8 +38,8 @@ void SkanToPdfDlg::on_closeButton_clicked()
 {
     bool canClose = false;
     if (_dirty) {
-        int response = QMessageBox::warning(this,tr("Closing skanToPdf"), tr("Data are not saved. Closing anyway ?"),QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
-        if (response == QMessageBox::Yes ) {
+        int response = QMessageBox::warning(this, tr("Closing skanToPdf"), tr("Data are not saved. Closing anyway ?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        if (response == QMessageBox::Yes) {
             canClose = true;
         }
     } else {
@@ -56,9 +57,9 @@ void SkanToPdfDlg::on_closeButton_clicked()
  * @param bytes_per_line
  * @param format
  */
-void SkanToPdfDlg::onImageReady(QByteArray &data, int width, int height, int bytes_per_line, int format)
+void SkanToPdfDlg::onImageReady(QByteArray& data, int width, int height, int bytes_per_line, int format)
 {
-    QImage image = ui->skanWidget->toQImage(data,width,height, bytes_per_line, (KSaneIface::KSaneWidget::ImageFormat) format);
+    QImage image = ui->skanWidget->toQImage(data, width, height, bytes_per_line, (KSaneIface::KSaneWidget::ImageFormat)format);
     _images.append(image);
     _dirty = true;
 }
@@ -69,29 +70,35 @@ void SkanToPdfDlg::onImageReady(QByteArray &data, int width, int height, int byt
  * @param options: options of the scanner
  * @param selectedDevice selected device string
  */
-void SkanToPdfDlg::initDevice(QMap<QString,QString> options, QString selectedDevice)
+void SkanToPdfDlg::initDevice(QMap<QString, QString> options, QString selectedDevice)
 {
     ui->skanWidget->openDevice(selectedDevice);
-    ui->skanWidget->setOptionsCollapsed(true);
+    ui->skanWidget->setOptionsCollapsed(false);
     ui->skanWidget->getOptVals(options);
-    ui->skanWidget->setOptVal("mode","Color");
-    ui->skanWidget->setOptVal("resolution","100 DPI");
+    ui->skanWidget->setOptVal("mode", "Color");
+    ui->skanWidget->setOptVal("resolution", "100 DPI");
     ui->skanWidget->enableAutoSelect(false);
     ui->skanWidget->setPreviewButtonText(tr("Preview"));
     ui->skanWidget->setScanButtonText(tr("Add to document"));
     //connect the slot
-    connect (ui->skanWidget, &KSaneIface::KSaneWidget::imageReady, this,  &SkanToPdfDlg::onImageReady );
+    connect(ui->skanWidget, &KSaneIface::KSaneWidget::imageReady, this, &SkanToPdfDlg::onImageReady);
 }
 
 /**
  * @brief SkanToPdfDlg::initialize
  */
-void SkanToPdfDlg::initialize() {
+void SkanToPdfDlg::initialize()
+{
     QString selectedDevice = "";
-    QMap<QString,QString> options;
+    QMap<QString, QString> options;
 
     bool getOut = false;
     bool deviceInitialized = false;
+    QString currentFolder = AppContext::getInstance()->getCurrentFolder();
+    ui->folderLineEdit->setText(currentFolder);
+    AutomaticFileNameFeeder feeder;
+    ui->pdfNameLineEdit->setText(feeder.getFileName(currentFolder));
+
     while (!getOut) {
         selectedDevice = ui->skanWidget->selectDevice(this).trimmed();
         // Initialize the scanner
@@ -101,22 +108,18 @@ void SkanToPdfDlg::initialize() {
             deviceInitialized = true;
         } else {
             int response = QMessageBox::critical(this, tr("Scanner problem"),
-                                                 tr("No scanner has been selected or found.")
-                                                 , QMessageBox::Retry, QMessageBox::Abort);
+                tr("No scanner has been selected or found."), QMessageBox::Retry, QMessageBox::Abort);
             if (response == QMessageBox::Abort) {
                 getOut = true;
                 deviceInitialized = false;
             }
         }
-
     }
-
 
     if (!deviceInitialized) {
         this->close();
         QApplication::exit(-1);
     }
-
 }
 
 /**
@@ -131,7 +134,9 @@ void SkanToPdfDlg::on_folderFindBtn_clicked()
     int result = dirDialog.exec();
 
     if (result == QDialog::Accepted) {
-        ui->folderLineEdit->setText(dirDialog.selectedFiles().at(0));
+        QString selectedFolder = dirDialog.selectedFiles().at(0);
+        ui->folderLineEdit->setText(selectedFolder);
+        AppContext::getInstance()->setCurrentFolder(selectedFolder);
     }
 }
 
@@ -141,7 +146,8 @@ void SkanToPdfDlg::on_folderFindBtn_clicked()
  * @param lineEdit the given line edit
  * @return the trimmed text of the linedit
  */
-QString SkanToPdfDlg::retrieveText(const QLineEdit* const lineEdit) {
+QString SkanToPdfDlg::retrieveText(const QLineEdit* const lineEdit)
+{
     QString retrievedText = "";
     if (lineEdit != nullptr) {
         retrievedText = lineEdit->text().trimmed();
@@ -159,18 +165,18 @@ void SkanToPdfDlg::on_saveBtn_clicked()
     QString pdfName = "";
 
     // Retrieve data from boxes
-    folderName = retrieveText( ui->folderLineEdit);
+    folderName = retrieveText(ui->folderLineEdit);
     pdfName = retrieveText(ui->pdfNameLineEdit);
 
     // Check values and out if invalid
     if (folderName.isEmpty()) {
-        QMessageBox::critical(this, tr("Folder name"), tr("A folder name must be supplied.") );
+        QMessageBox::critical(this, tr("Folder name"), tr("A folder name must be supplied."));
         ui->folderLineEdit->setFocus();
         return;
     }
 
     if (pdfName.isEmpty()) {
-        QMessageBox::critical(this,tr("Pdf name"), tr("A pdf filename must be supplied."));
+        QMessageBox::critical(this, tr("Pdf name"), tr("A pdf filename must be supplied."));
         ui->pdfNameLineEdit->setFocus();
         return;
     }
@@ -179,11 +185,13 @@ void SkanToPdfDlg::on_saveBtn_clicked()
 
     // Check generated file nalme existence
     if (QFile::exists(pathToPdfFile)) {
-        int result = QMessageBox::warning(this,tr("File exists"),
-                                          QString(tr("Warning %1 already exists in folder %2. Overwrite it ?"))
-                                          .arg(pdfName).arg(folderName),QMessageBox::Yes, QMessageBox::No);
+        int result = QMessageBox::warning(this, tr("File exists"),
+            QString(tr("Warning %1 already exists in folder %2. Overwrite it ?"))
+                .arg(pdfName)
+                .arg(folderName),
+            QMessageBox::Yes, QMessageBox::No);
         if (result == QMessageBox::No) {
-            QMessageBox::warning(this,tr("Warning"), tr("Change file name or folder."));
+            QMessageBox::warning(this, tr("Warning"), tr("Change file name or folder."));
             ui->pdfNameLineEdit->setFocus();
             return;
         }
@@ -191,7 +199,7 @@ void SkanToPdfDlg::on_saveBtn_clicked()
 
     QPrinter printer;
     // Prepare pdf printer
-    setupPrinter(printer,pathToPdfFile );
+    setupPrinter(printer, pathToPdfFile);
 
     // Print pages
     printPages(printer, pdfName, folderName);
@@ -204,7 +212,7 @@ void SkanToPdfDlg::on_saveBtn_clicked()
  * @param folder the given folder name
  * @return  the correct url of the file
  */
-QString SkanToPdfDlg::createFileUrl(const QString& file,  const QString& folder)
+QString SkanToPdfDlg::createFileUrl(const QString& file, const QString& folder)
 {
     QString pathToPdfFile = folder;
     if (!folder.endsWith("/")) {
@@ -225,7 +233,6 @@ QString SkanToPdfDlg::createFileUrl(const QString& file,  const QString& folder)
  */
 void SkanToPdfDlg::on_btnPreview_clicked()
 {
-
 }
 
 /**
@@ -234,16 +241,16 @@ void SkanToPdfDlg::on_btnPreview_clicked()
  * @param printer the printer
  * @param pathToPdfFile the file wher to store
  */
-void SkanToPdfDlg::setupPrinter(QPrinter& printer, const QString& pathToPdfFile )
+void SkanToPdfDlg::setupPrinter(QPrinter& printer, const QString& pathToPdfFile)
 {
     printer.setOutputFormat(QPrinter::PdfFormat);
     printer.setOutputFileName(pathToPdfFile);
 
     QPrinter::Margins margins;
     margins.bottom = 0.0;
-    margins.top =0.0;
+    margins.top = 0.0;
     margins.left = 0.0;
-    margins.right =0.0;
+    margins.right = 0.0;
     printer.setMargins(margins);
     printer.setFullPage(true);
     QPageLayout layout = printer.pageLayout();
@@ -258,7 +265,7 @@ void SkanToPdfDlg::setupPrinter(QPrinter& printer, const QString& pathToPdfFile 
  * @param file the given filename
  * @param folder the given folder
  */
-void SkanToPdfDlg::printPages(QPrinter& printer, const QString &file, const QString &folder)
+void SkanToPdfDlg::printPages(QPrinter& printer, const QString& file, const QString& folder)
 {
     QPainter painter;
     QRectF pageRect;
@@ -269,10 +276,10 @@ void SkanToPdfDlg::printPages(QPrinter& printer, const QString &file, const QStr
         if (index != 0) {
             printer.newPage();
         }
-        painter.drawImage(printer.pageRect(),_images.at(index));
+        painter.drawImage(printer.pageRect(), _images.at(index));
     }
     painter.end();
-    QMessageBox::information(this,QString(tr("Saving file")),QString("File %1 has been saved in folder %2.").arg(file).arg(folder));
+    QMessageBox::information(this, QString(tr("Saving file")), QString("File %1 has been saved in folder %2.").arg(file).arg(folder));
     _dirty = false;
 }
 
@@ -290,7 +297,7 @@ void SkanToPdfDlg::on_sendMailBtn_clicked()
 
     if (!QFile::exists(filename)) {
         QString errorMessage = tr("%1 does not exist.");
-        QMessageBox::critical(this,tr("Error"), errorMessage);
+        QMessageBox::critical(this, tr("Error"), errorMessage);
         return;
     }
 
