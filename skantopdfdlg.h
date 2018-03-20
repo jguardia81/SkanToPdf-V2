@@ -1,14 +1,14 @@
 #ifndef SKANTOPDFDLG_H
 #define SKANTOPDFDLG_H
 
-#include <QDialog>
 #include <QByteArray>
-#include <QList>
+#include <QDialog>
 #include <QImage>
 #include <QLineEdit>
+#include <QList>
 #include <QPrinter>
-#include <QString>
 #include <QSettings>
+#include <QString>
 
 namespace Ui {
 class SkanToPdfDlg;
@@ -17,8 +17,7 @@ class SkanToPdfDlg;
  * @brief The SkanToPdfDlg class
  * Main window of the app
  */
-class SkanToPdfDlg : public QDialog
-{
+class SkanToPdfDlg : public QDialog {
     Q_OBJECT
 
 public:
@@ -27,7 +26,7 @@ public:
      * Contructor of the class
      * @param parent given parent widget
      */
-    explicit SkanToPdfDlg(QWidget *parent = 0);
+    explicit SkanToPdfDlg(QWidget* parent = 0);
     /**
      * @brief Destuctor
      */
@@ -49,28 +48,30 @@ private slots:
      * @param bytes_per_line nb of bits per line
      * @param format image format
      */
-    void onImageReady(QByteArray &data, int width, int height, int bytes_per_line, int format);
+    void onImageReady(QByteArray& data, int width, int height, int bytes_per_line, int format);
     void on_folderFindBtn_clicked();
     void on_saveBtn_clicked();
     void on_btnPreview_clicked();
 
     void on_sendMailBtn_clicked();
 
+    void on_btnNewDoc_clicked();
+
 private:
-    Ui::SkanToPdfDlg *ui; /// the ui pointer
+    Ui::SkanToPdfDlg* ui; /// the ui pointer
     bool _dirty = false; /// indicator of dirty state
-    QList <QImage> _images; /// Scanned images list
+    QList<QImage> _images; /// Scanned images list
     /**
      * @brief initialize
      * initialize the window with default values
      */
     void initialize();
-    void initDevice(QMap<QString,QString> options, QString selectedDevice);
+    void initDevice(QMap<QString, QString> options, QString selectedDevice);
 
-    QString retrieveText(const QLineEdit * const lineEdit);
-    QString createFileUrl(const QString &file, const QString &folder);
-    void setupPrinter(QPrinter &printer, const QString &pathToPdfFile);
-    void printPages(QPrinter &printer, const QString &file, const QString &folder);
+    QString retrieveText(const QLineEdit* const lineEdit);
+    QString createFileUrl(const QString& file, const QString& folder);
+    void setupPrinter(QPrinter& printer, const QString& pathToPdfFile);
+    void printPages(QPrinter& printer, const QString& file, const QString& folder);
     QString _attachement = "";
     QString _pdfFile = "";
     QSettings* _appSettings = nullptr;

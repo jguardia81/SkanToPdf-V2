@@ -59,8 +59,9 @@ void SkanToPdfDlg::on_closeButton_clicked()
  */
 void SkanToPdfDlg::onImageReady(QByteArray& data, int width, int height, int bytes_per_line, int format)
 {
-    QImage image = ui->skanWidget->toQImage(data, width, height, bytes_per_line, (KSaneIface::KSaneWidget::ImageFormat)format);
+    QImage image = ui->skanWidget->toQImage(data, width, height, bytes_per_line, static_cast<KSaneIface::KSaneWidget::ImageFormat>(format));
     _images.append(image);
+    ui->txtPageCount->setText(QString::number(_images.size()));
     _dirty = true;
 }
 
@@ -99,6 +100,7 @@ void SkanToPdfDlg::initialize()
     AutomaticFileNameFeeder feeder;
     ui->pdfNameLineEdit->setText(feeder.getFileName(currentFolder));
 
+    ui->txtPageCount->setText(QString::number(_images.size()));
     while (!getOut) {
         selectedDevice = ui->skanWidget->selectDevice(this).trimmed();
         // Initialize the scanner
@@ -305,4 +307,23 @@ void SkanToPdfDlg::on_sendMailBtn_clicked()
     QString urlToOpen = QString("mailto:?subject=%1&attach=%2").arg(subject).arg(filename);
 
     QDesktopServices::openUrl(QUrl(urlToOpen));
+}
+
+void SkanToPdfDlg::on_btnNewDoc_clicked()
+{
+    bool canReset = false;
+    if (_dirty) {
+        int response = QMessageBox::warning(this, tr("Reset document"), tr("Data are not saved. Resetting anyway ?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        if (response == QMessageBox::Yes) {
+            canReset = true;
+        }
+    } else {
+        canReset = true;
+    }
+    if (canReset) {
+        _images.clear();
+        _dirty = false;
+        ui->pdfNameLineEdit->setText("");
+        ui->txtPageCount->setText(QString::number(_images.size()));
+    }
 }
