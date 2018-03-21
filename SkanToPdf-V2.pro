@@ -8,7 +8,7 @@ QT       += core gui printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = SkanToPdfIV2
+TARGET = SkanToPdf-V2
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -22,7 +22,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-TRANSLATIONS = SkanToPdfIV2_fr.ts
+TRANSLATIONS = SkanToPdf-V2_fr.ts
 SOURCES += \
         main.cpp \
         skantopdfdlg.cpp \
