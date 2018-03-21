@@ -11,6 +11,8 @@
 #include <QString>
 #include <QUrl>
 
+#include "pdfpreviewdlg.h"
+
 /**
  * @brief SkanToPdfDlg::SkanToPdfDlg
  * @param parent: given parent widget
@@ -235,6 +237,18 @@ QString SkanToPdfDlg::createFileUrl(const QString& file, const QString& folder)
  */
 void SkanToPdfDlg::on_btnPreview_clicked()
 {
+    PdfPreviewDlg pdfPreview(_images, this);
+
+    int result = pdfPreview.exec();
+    if (result == QDialog::Accepted) {
+        _images = pdfPreview.previewImages();
+        ui->txtPageCount->setText(QString::number(_images.size()));
+        QMessageBox::information(this, tr("Pdf update"), tr("Final pdf has been updated."));
+    } else {
+        if (pdfPreview.modified()) {
+            QMessageBox::information(this, tr("Pdf update"), tr("Pdf updates are not taken into account."));
+        }
+    }
 }
 
 /**
@@ -308,7 +322,10 @@ void SkanToPdfDlg::on_sendMailBtn_clicked()
 
     QDesktopServices::openUrl(QUrl(urlToOpen));
 }
-
+/**
+ * @brief SkanToPdfDlg::on_btnNewDoc_clicked
+ * Response to new doc event
+ */
 void SkanToPdfDlg::on_btnNewDoc_clicked()
 {
     bool canReset = false;

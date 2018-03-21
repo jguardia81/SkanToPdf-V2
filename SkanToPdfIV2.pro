@@ -27,14 +27,17 @@ SOURCES += \
         main.cpp \
         skantopdfdlg.cpp \
     automaticfilenamefeeder.cpp \
-    appcontext.cpp
+    appcontext.cpp \
+    pdfpreviewdlg.cpp
 
 HEADERS += \
         skantopdfdlg.h \
     automaticfilenamefeeder.h \
-    appcontext.h
+    appcontext.h \
+    pdfpreviewdlg.h
 
 FORMS += \
-        skantopdfdlg.ui
+        skantopdfdlg.ui \
+    pdfpreviewdlg.ui
 
 LIBS += -lKF5Sane
