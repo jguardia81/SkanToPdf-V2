@@ -29,6 +29,8 @@ private slots:
 
     void on_btnLast_clicked();
 
+    void on_btnDeletePage_clicked();
+
 private:
     Ui::PdfPreviewDlg* ui;
     QList<QImage> _previewImages;

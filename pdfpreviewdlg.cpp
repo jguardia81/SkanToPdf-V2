@@ -62,12 +62,13 @@ void PdfPreviewDlg::updateGui()
 
 void PdfPreviewDlg::displayImage()
 {
+    QPixmap imageToDisplay;
     if (_currentIndex >= 0 && _currentIndex < _imageCount) {
-        QPixmap imageToDisplay = QPixmap::fromImage(_previewImages.at(_currentIndex));
-        QPixmap finalImage = imageToDisplay.scaledToHeight(700);
-        ui->lblShowImage->setPixmap(finalImage);
-        updateGui();
+        imageToDisplay = QPixmap::fromImage(_previewImages.at(_currentIndex));
     }
+    QPixmap finalImage = imageToDisplay.scaledToHeight(700);
+    ui->lblShowImage->setPixmap(finalImage);
+    updateGui();
 }
 
 bool PdfPreviewDlg::modified() const
@@ -102,6 +103,21 @@ void PdfPreviewDlg::on_btnLast_clicked()
 {
     if (_currentIndex < _imageCount - 1) {
         _currentIndex = _imageCount - 1;
+        displayImage();
+    }
+}
+
+void PdfPreviewDlg::on_btnDeletePage_clicked()
+{
+    if (_currentIndex >= 0 && _currentIndex < _imageCount) {
+        _previewImages.removeAt(_currentIndex);
+        _modified = true;
+        _imageCount--;
+        if (_imageCount <= 0) {
+            _currentIndex = -1;
+        } else if (_currentIndex >= _imageCount) {
+            _currentIndex = _imageCount - 1;
+        }
         displayImage();
     }
 }
