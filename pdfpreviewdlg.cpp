@@ -63,11 +63,14 @@ void PdfPreviewDlg::updateGui()
 void PdfPreviewDlg::displayImage()
 {
     QPixmap imageToDisplay;
+    QString selectedPage = "";
     if (_currentIndex >= 0 && _currentIndex < _imageCount) {
         imageToDisplay = QPixmap::fromImage(_previewImages.at(_currentIndex));
+        selectedPage = QString("%1 / %2").arg(QString::number(_currentIndex + 1)).arg(QString::number(_imageCount));
     }
     QPixmap finalImage = imageToDisplay.scaledToHeight(700);
     ui->lblShowImage->setPixmap(finalImage);
+    ui->txtPageCount->setText(selectedPage);
     updateGui();
 }
 
@@ -75,6 +78,7 @@ bool PdfPreviewDlg::modified() const
 {
     return _modified;
 }
+
 void PdfPreviewDlg::on_btnFirst_clicked()
 {
     if (_currentIndex > 0) {
