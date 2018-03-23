@@ -14,15 +14,10 @@ AppContext::AppContext(QObject* parent)
 
     _appSettings = new QSettings(this);
     QStringList documentFolders = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation);
-    qDebug() << documentFolders;
 
     _currentFolder = assignStoredValue(QString("pdfstuff/lastfolder"), documentFolders.at(0));
-
-    _defaultFilename = _appSettings->value("pdfstuff/defaultFileName").toString();
-    if (_defaultFilename.isEmpty()) {
-        _defaultFilename = "producedPdf";
-        _appSettings->setValue("pdfstuff/defaultFileName", _defaultFilename);
-    }
+    _defaultFilename = assignStoredValue("pdfstuff/defaultFileName", "producedPdf");
+    _defaultExtention = assignStoredValue("pdfstuff/defaultExtName", "pdf");
 }
 
 QString AppContext::assignStoredValue(QString key, QString defaultValue)
@@ -66,7 +61,10 @@ QString AppContext::getPdfFileName() const
     return _pdfFileName;
 }
 
-void AppContext::setPdfFileName(const QString& value) { _pdfFileName = value; }
+void AppContext::setPdfFileName(const QString& value)
+{
+    _pdfFileName = value;
+}
 
 QString AppContext::getPdfFileUrl()
 {

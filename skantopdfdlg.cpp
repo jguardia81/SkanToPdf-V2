@@ -342,5 +342,7 @@ void SkanToPdfDlg::on_btnNewDoc_clicked()
         _dirty = false;
         ui->pdfNameLineEdit->setText("");
         ui->txtPageCount->setText(QString::number(_images.size()));
+        AutomaticFileNameFeeder feeder;
+        ui->pdfNameLineEdit->setText(feeder.getFileName(ui->folderLineEdit->text()));
     }
 }
