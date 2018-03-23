@@ -60,7 +60,7 @@
     <message>
         <location filename="skantopdfdlg.ui" line="69"/>
         <source>...</source>
-        <translation></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="skantopdfdlg.ui" line="44"/>
